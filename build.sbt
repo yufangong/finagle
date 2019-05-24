@@ -55,11 +55,10 @@ def util(which: String) =
 val sharedSettings = Seq(
   version := releaseVersion,
   organization := "com.twitter",
-  scalaVersion := "2.12.8",
-  crossScalaVersions := Seq("2.11.12", "2.12.8"),
+  scalaVersion := "2.13.0-RC1",
   libraryDependencies ++= Seq(
-    "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.8-RC2" % "test",
     // See https://www.scala-sbt.org/0.13/docs/Testing.html#JUnit
     "com.novocode" % "junit-interface" % "0.11" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test"
@@ -415,7 +414,7 @@ lazy val finagleServersets = Project(
   ScroogeSBT.autoImport.scroogeLanguages in Compile := Seq("java"),
   excludeFilter in unmanagedSources := "ZkTest.scala",
   scalacOptions in (Compile, doc) ++= {
-    if (scalaVersion.value.startsWith("2.12")) Seq("-no-java-comments")
+    if (scalaVersion.value.startsWith("2.13")) Seq("-no-java-comments")
     else Nil
   }
 ).dependsOn(finagleCore)
