@@ -6,6 +6,7 @@ import com.twitter.finagle.memcached.protocol.{ClientError, Value}
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Time}
 import scala.collection.mutable
+import scala.IterableOnce
 
 object MockClient {
   case class Cached(value: Buf, expiry: Time = Time.epoch, flags: Int = 0)
@@ -81,7 +82,7 @@ class MockClient extends Client {
   }
 
   /** convenience method for adding several values directly to the underlying map */
-  def ++=(kvs: TraversableOnce[(String, Cached)]): MockClient = {
+  def ++=(kvs: IterableOnce[(String, Cached)]): MockClient = {
     mm.synchronized { mm ++= kvs }
     this
   }

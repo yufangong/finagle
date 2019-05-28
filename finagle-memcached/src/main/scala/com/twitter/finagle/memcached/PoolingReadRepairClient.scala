@@ -64,7 +64,7 @@ class PoolingReadRepairClient(
   def getSubsetOfClients() = {
     val num = if (rand.nextFloat < readRepairProbability) readRepairCount + 1 else 1
     val buf = new ArrayBuffer[BaseClient[Buf]]
-    allClients.copyToBuffer(buf)
+    buf ++= allClients
     while (buf.size > num) {
       buf.remove(rand.nextInt(buf.size))
     }

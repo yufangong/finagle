@@ -55,7 +55,7 @@ def util(which: String) =
 val sharedSettings = Seq(
   version := releaseVersion,
   organization := "com.twitter",
-  scalaVersion := "2.13.0-RC1",
+  scalaVersion := "2.12.8",
   libraryDependencies ++= Seq(
     "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
     "org.scalatest" %% "scalatest" % "3.0.8-RC2" % "test",
@@ -84,6 +84,10 @@ val sharedSettings = Seq(
     "-Xlint:-missing-interpolator",
     "-Ypatmat-exhaust-depth", "40"
   ),
+  scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
+  libraryDependencies +=  "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
+  addCompilerPlugin(scalafixSemanticdb),
+  scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
   javacOptions ++= Seq("-Xlint:unchecked", "-source", "1.8", "-target", "1.8"),
   javacOptions in doc := Seq("-source", "1.8"),
 
@@ -414,7 +418,7 @@ lazy val finagleServersets = Project(
   ScroogeSBT.autoImport.scroogeLanguages in Compile := Seq("java"),
   excludeFilter in unmanagedSources := "ZkTest.scala",
   scalacOptions in (Compile, doc) ++= {
-    if (scalaVersion.value.startsWith("2.13")) Seq("-no-java-comments")
+    if (scalaVersion.value.startsWith("2.12")) Seq("-no-java-comments")
     else Nil
   }
 ).dependsOn(finagleCore)
@@ -512,7 +516,7 @@ lazy val finagleMemcached = Project(
   libraryDependencies ++= Seq(
     util("hashing"),
     util("zk-test") % "test",
-    "com.twitter" %% "bijection-core" % "0.9.4",
+    "com.twitter" % "bijection-core_2.12" % "0.9.4",
     "org.apache.thrift" % "libthrift" % libthriftVersion
   ),
   libraryDependencies ++= jacksonLibs

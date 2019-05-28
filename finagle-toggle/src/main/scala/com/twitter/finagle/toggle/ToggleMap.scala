@@ -11,7 +11,7 @@ import java.util.{function => juf}
 import java.{lang => jl}
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
-import scala.collection.{breakOut, immutable, mutable}
+import scala.collection.{immutable, mutable}
 import scala.util.hashing.MurmurHash3
 
 /**
@@ -351,9 +351,9 @@ object ToggleMap {
   class Immutable(metadata: immutable.Seq[Toggle.Metadata]) extends ToggleMap {
 
     private[this] val toggles: immutable.Map[String, Toggle[Int]] =
-      metadata.map { md =>
+      metadata.iterator.map { md =>
         md.id -> fractional(md.id, md.fraction)
-      }(breakOut)
+      }.toMap
 
     override def toString: String =
       s"ToggleMap.Immutable@${System.identityHashCode(this)}"

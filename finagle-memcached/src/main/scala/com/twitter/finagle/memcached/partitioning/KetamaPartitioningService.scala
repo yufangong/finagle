@@ -7,7 +7,6 @@ import com.twitter.finagle.param.Logger
 import com.twitter.hashing._
 import com.twitter.logging.Level
 import com.twitter.util._
-import scala.collection.breakOut
 
 /**
  * KetamaPartitioningService implements consistent hashing based partitioning across the
@@ -109,10 +108,10 @@ private[finagle] abstract class KetamaPartitioningService[Req, Rep, Key](
             // all keys belong to the same partition
             Seq((request, partitionForKey(keys.head)))
           case keyMap =>
-            keyMap.map {
+            keyMap.iterator.map {
               case (ps, pKeys) =>
                 (createPartitionRequestForKeys(request, pKeys.toSeq), ps)
-            }(breakOut)
+            }.to(scala.collection.immutable.IndexedSeq)
         }
       case _ =>
         if (logger.isLoggable(Level.DEBUG))

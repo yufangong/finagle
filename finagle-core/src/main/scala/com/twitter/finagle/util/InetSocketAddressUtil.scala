@@ -1,7 +1,6 @@
 package com.twitter.finagle.util
 
 import java.net.{InetAddress, InetSocketAddress, SocketAddress, UnknownHostException}
-import scala.collection.breakOut
 
 object InetSocketAddressUtil {
 
@@ -58,10 +57,10 @@ object InetSocketAddressUtil {
     hostPorts map {
       case (host, port) =>
         InetAddress
-          .getAllByName(host)
+          .getAllByName(host).iterator
           .map { addr =>
             new InetSocketAddress(addr, port)
-          }(breakOut)
+          }.toIndexedSeq
     }
 
   /**
@@ -77,12 +76,12 @@ object InetSocketAddressUtil {
   def parseHosts(hosts: String): Seq[InetSocketAddress] = {
     if (hosts == ":*") return Seq(new InetSocketAddress(0))
 
-    parseHostPorts(hosts).map[InetSocketAddress, List[InetSocketAddress]] {
+    parseHostPorts(hosts).iterator.map {
       case (host, port) =>
         if (host == "")
           new InetSocketAddress(port)
         else
           new InetSocketAddress(host, port)
-    }(breakOut)
+    }.toIndexedSeq
   }
 }

@@ -21,7 +21,6 @@ import com.twitter.hashing._
 import com.twitter.io.Buf
 import com.twitter.logging.Level
 import com.twitter.util.{Command => _, Function => _, _}
-import scala.collection.breakOut
 import scala.collection.{immutable, mutable}
 
 object Client {
@@ -619,10 +618,10 @@ private[memcached] object ClientConstants {
   }
 
   def hitsFromValues(values: Seq[Value]): Map[String, Value] =
-    values.map { value =>
+    values.iterator.map { value =>
       val Buf.Utf8(keyStr) = value.key
       (keyStr, value)
-    }(breakOut)
+    }.toMap
 }
 
 /**
@@ -634,7 +633,7 @@ protected class ConnectedClient(protected val service: Service[Command, Response
   import ClientConstants._
 
   protected def rawGet(command: RetrievalCommand): Future[GetResult] = {
-    val keys: immutable.Set[String] = command.keys.map { case Buf.Utf8(s) => s }(breakOut)
+    val keys: immutable.Set[String] = command.keys.iterator.map { case Buf.Utf8(s) => s }.to(scala.collection.immutable.Set)
 
     service(command).transform {
       case Return(Values(values)) =>
@@ -656,11 +655,11 @@ protected class ConnectedClient(protected val service: Service[Command, Response
           "Invalid response type from get: %s".format(other.getClass.getSimpleName)
         )
       case Throw(t: RequestException) =>
-        Future.value(GetResult(failures = keys.map { (_, t) }(breakOut)))
+        Future.value(GetResult(failures = keys.iterator.map { (_, t) }.toMap))
       case Throw(t: ChannelException) =>
-        Future.value(GetResult(failures = keys.map { (_, t) }(breakOut)))
+        Future.value(GetResult(failures = keys.iterator.map { (_, t) }.toMap))
       case Throw(t: ServiceException) =>
-        Future.value(GetResult(failures = keys.map { (_, t) }(breakOut)))
+        Future.value(GetResult(failures = keys.iterator.map { (_, t) }.toMap))
       case t => Future.const(t.asInstanceOf[Try[GetResult]])
     }
   }
@@ -819,7 +818,7 @@ protected class ConnectedClient(protected val service: Service[Command, Response
   def stats(args: Option[String]): Future[Seq[String]] = {
     val statArgs: Seq[Buf] = args match {
       case None => Seq(Buf.Empty)
-      case Some(args) => args.split(" ").map(nonEmptyStringToBuf)(breakOut)
+      case Some(args) => args.split(" ").iterator.map(nonEmptyStringToBuf).to(scala.collection.immutable.IndexedSeq)
     }
     service(Stats(statArgs)).flatMap {
       case InfoLines(lines) =>
@@ -854,7 +853,7 @@ trait PartitionedClient extends Client {
   )(f: (Client, Iterable[String]) => Future[A]
   ): Future[Seq[A]] = {
     Future.collect(
-      keys.groupBy(clientOf).map(Function.tupled(f))(breakOut)
+      keys.groupBy(clientOf).iterator.map(Function.tupled(f)).to(scala.collection.immutable.IndexedSeq)
     )
   }
 
@@ -1209,7 +1208,7 @@ private[finagle] class KetamaPartitionedClient(
   private[this] def rebuildDistributor(): Unit = self.synchronized {
     keyRingRedistributeCount.incr()
 
-    val liveNodes = nodes.collect({ case (_, Node(node, NodeState.Live)) => node })(breakOut)
+    val liveNodes = nodes.iterator.collect({ case (_, Node(node, NodeState.Live)) => node }).to(scala.collection.immutable.IndexedSeq)
 
     currentDistributor =
       if (liveNodes.isEmpty) shardNotAvailableDistributor
@@ -1343,9 +1342,9 @@ case class RubyMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): RubyMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map { node: CacheNode =>
+    copy(_nodes = CacheNodeGroup(hostPortWeights).members.iterator.map { node: CacheNode =>
       (node.host, node.port, node.weight)
-    }(breakOut))
+    }.to(scala.collection.immutable.IndexedSeq))
 
   def clientBuilder(
     clientBuilder: ClientBuilder[_, _, _, _, ClientConfig.Yes]
@@ -1391,9 +1390,9 @@ case class PHPMemCacheClientBuilder(
     copy(_nodes = nodes)
 
   def nodes(hostPortWeights: String): PHPMemCacheClientBuilder =
-    copy(_nodes = CacheNodeGroup(hostPortWeights).members.map { node: CacheNode =>
+    copy(_nodes = CacheNodeGroup(hostPortWeights).members.iterator.map { node: CacheNode =>
       (node.host, node.port, node.weight)
-    }(breakOut))
+    }.to(scala.collection.immutable.IndexedSeq))
 
   def hashName(hashName: String): PHPMemCacheClientBuilder =
     copy(_hashName = Some(hashName))

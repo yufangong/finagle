@@ -11,7 +11,7 @@ import com.twitter.finagle.service.FailedService
 import com.twitter.hashing._
 import com.twitter.util._
 import java.net.InetSocketAddress
-import scala.collection.{breakOut, mutable}
+import scala.collection.mutable
 
 /**
  * Helper class for managing the nodes in the Ketama ring. Note that it tracks all addresses
@@ -189,7 +189,7 @@ private[partitioning] class KetamaNodeManager[Req, Rep, Key](
   private[this] def rebuildDistributor(): Unit = self.synchronized {
     keyRingRedistributeCount.incr()
 
-    val liveNodes = nodes.collect({ case (_, Node(node, NodeState.Live)) => node })(breakOut)
+    val liveNodes = nodes.iterator.collect({ case (_, Node(node, NodeState.Live)) => node }).to(scala.collection.immutable.IndexedSeq)
 
     currentDistributor = if (liveNodes.isEmpty) {
       shardNotAvailableDistributor

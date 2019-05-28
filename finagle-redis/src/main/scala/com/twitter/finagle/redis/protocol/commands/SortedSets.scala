@@ -189,7 +189,7 @@ object ZUnionStore {
  */
 case class ZRangeResults(entries: Array[Buf], scores: Array[Double]) {
   def asTuples(): Seq[(Buf, Double)] =
-    (entries, scores).zipped.map { (entry, score) =>
+    entries.lazyZip(scores).map { (entry, score) =>
       (entry, score)
     }.toSeq
 }

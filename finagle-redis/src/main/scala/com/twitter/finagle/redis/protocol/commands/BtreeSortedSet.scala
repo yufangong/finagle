@@ -37,10 +37,10 @@ case class BRange(key: Buf, count: Buf, startField: Option[Buf], endField: Optio
 case class BMergeEx(key: Buf, fv: Map[Buf, Buf], milliseconds: Long) extends StrictKeyCommand {
   def name: Buf = Command.BMERGEEX
   override def body: Seq[Buf] = {
-    val fvList: Seq[Buf] = fv.flatMap {
+    val fvList: Seq[Buf] = fv.iterator.flatMap {
       case (f, v) =>
         f :: v :: Nil
-    }(collection.breakOut)
+    }.to(scala.collection.immutable.IndexedSeq)
 
     key +: (Buf.Utf8(milliseconds.toString) +: fvList)
   }

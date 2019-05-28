@@ -7,6 +7,7 @@ import java.io.PrintWriter
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.VectorBuilder
 import scala.collection.mutable.Builder
+import scala.IterableOnce
 
 /**
  * A Dtab--short for delegation table--comprises a sequence of
@@ -358,9 +359,9 @@ object Dtab {
   /** Scala collection plumbing required to build new dtabs */
   def newBuilder: DtabBuilder = new DtabBuilder
 
-  implicit val canBuildFrom: CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] =
-    new CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] {
-      def apply(_ign: TraversableOnce[Dentry]): DtabBuilder = newBuilder
+  implicit val canBuildFrom: CanBuildFrom[IterableOnce[Dentry], Dentry, Dtab] =
+    new CanBuildFrom[IterableOnce[Dentry], Dentry, Dtab] {
+      def apply(_ign: IterableOnce[Dentry]): DtabBuilder = newBuilder
       def apply(): DtabBuilder = newBuilder
     }
 

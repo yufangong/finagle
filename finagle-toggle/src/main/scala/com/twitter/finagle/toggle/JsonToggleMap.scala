@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.util.Try
 import java.net.URL
 import scala.collection.mutable
-import scala.collection.{breakOut, immutable}
+import scala.collection.immutable
 
 /**
  * [[ToggleMap ToggleMaps]] in JSON format.
@@ -126,13 +126,13 @@ object JsonToggleMap {
       }
 
       val metadata: immutable.Seq[Toggle.Metadata] =
-        toggles.map { jsonToggle =>
+        toggles.iterator.map { jsonToggle =>
           val description = descriptionMode match {
             case DescriptionRequired => jsonToggle.description
             case DescriptionIgnored => None
           }
           Toggle.Metadata(jsonToggle.id, jsonToggle.fraction, description, source)
-        }(breakOut)
+        }.toIndexedSeq
 
       val ids = metadata.map(_.id)
       val uniqueIds = ids.distinct

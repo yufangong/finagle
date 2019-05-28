@@ -1,8 +1,8 @@
 package com.twitter.finagle.memcached.util
 
 import com.twitter.io.Buf
-import scala.collection.breakOut
 import scala.language.implicitConversions
+import scala.Iterable
 
 private[finagle] object Bufs {
 
@@ -20,11 +20,11 @@ private[finagle] object Bufs {
    * @return the Buf representation of non-empty and non-null Strings
    * @note returns null if input is null
    */
-  implicit def seqOfNonEmptyStringToBuf(strings: Traversable[String]): Seq[Buf] = {
+  implicit def seqOfNonEmptyStringToBuf(strings: Iterable[String]): Seq[Buf] = {
     if (strings == null) {
       null
     } else {
-      strings.map(nonEmptyStringToBuf)(breakOut)
+      strings.iterator.map(nonEmptyStringToBuf).to(scala.collection.immutable.IndexedSeq)
     }
   }
 

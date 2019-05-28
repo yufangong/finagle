@@ -1,7 +1,7 @@
 package com.twitter.finagle.stats
 
-import scala.collection.JavaConversions._
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 private object MetricsRegistry {
   case class StatEntryImpl(delta: Double, value: Double) extends StatEntry
