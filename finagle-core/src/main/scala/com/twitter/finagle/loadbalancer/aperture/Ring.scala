@@ -123,7 +123,7 @@ private class Ring(size: Int, rng: Rng) {
       i += 1
       r -= 1
     }
-    seq
+    seq.toSeq
   }
 
   /**

@@ -140,7 +140,7 @@ object ToggleMap {
       def compare(x: Metadata, y: Metadata): Int = {
         val ids = Ordering.String.compare(x.id, y.id)
         if (ids != 0) ids
-        else Ordering.Double.compare(x.fraction, y.fraction)
+        else Ordering.Double.TotalOrdering.compare(x.fraction, y.fraction)
       }
     }
 

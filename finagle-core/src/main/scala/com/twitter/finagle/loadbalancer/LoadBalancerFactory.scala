@@ -1,6 +1,6 @@
 package com.twitter.finagle.loadbalancer
 
-import com.twitter.finagle._
+import com.twitter.finagle.{exp => _, _}
 import com.twitter.finagle.client.Transporter
 import com.twitter.finagle.stats._
 import com.twitter.finagle.util.DefaultMonitor

@@ -153,7 +153,7 @@ private class NameTreeParsers private (str: String) {
         elems += parseDentryPrefixElem()
       } while (maybeEat('/'))
 
-      Dentry.Prefix(elems: _*)
+      Dentry.Prefix(elems.toSeq: _*)
     }
   }
 
@@ -170,7 +170,7 @@ private class NameTreeParsers private (str: String) {
         labels += parseLabel()
       } while (maybeEat('/'))
 
-      Path(labels: _*)
+      Path(labels.toSeq: _*)
     }
   }
 
@@ -183,7 +183,7 @@ private class NameTreeParsers private (str: String) {
     } while (maybeEat('|'))
 
     if (trees.size > 1)
-      NameTree.Alt(trees: _*)
+      NameTree.Alt(trees.toSeq: _*)
     else
       trees(0)
   }
@@ -197,7 +197,7 @@ private class NameTreeParsers private (str: String) {
     } while (maybeEat('&'))
 
     if (trees.size > 1)
-      NameTree.Union(trees: _*)
+      NameTree.Union(trees.toSeq: _*)
     else
       trees(0).tree
   }
@@ -267,7 +267,7 @@ private class NameTreeParsers private (str: String) {
       }
     } while (maybeEat(';'))
 
-    Dtab(dentries)
+    Dtab(dentries.toIndexedSeq)
   }
 
   def parseAllPath(): Path = {

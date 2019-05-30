@@ -4,10 +4,9 @@ import com.twitter.app.Flaggable
 import com.twitter.io.Buf
 import com.twitter.util.Local
 import java.io.PrintWriter
-import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.VectorBuilder
-import scala.collection.mutable.Builder
-import scala.IterableOnce
+import scala.collection.mutable.{Buffer, Builder}
+import scala.collection.{BuildFrom, mutable}
 
 /**
  * A Dtab--short for delegation table--comprises a sequence of
@@ -357,12 +356,13 @@ object Dtab {
   def read(s: String): Dtab = NameTreeParsers.parseDtab(s)
 
   /** Scala collection plumbing required to build new dtabs */
-  def newBuilder: DtabBuilder = new DtabBuilder
+  def newDtabBuilder: DtabBuilder = new DtabBuilder
 
-  implicit val canBuildFrom: CanBuildFrom[IterableOnce[Dentry], Dentry, Dtab] =
-    new CanBuildFrom[IterableOnce[Dentry], Dentry, Dtab] {
-      def apply(_ign: IterableOnce[Dentry]): DtabBuilder = newBuilder
-      def apply(): DtabBuilder = newBuilder
+  implicit val canBuildFrom: BuildFrom[IterableOnce[Dentry], Dentry, Dtab] =
+    new BuildFrom[IterableOnce[Dentry], Dentry, Dtab] {
+      def fromSpecific(from: IterableOnce[Dentry])
+        (it: IterableOnce[Dentry]): Dtab = newDtabBuilder.result()
+      def newBuilder(from: IterableOnce[Dentry]): mutable.Builder[Dentry, Dtab] = newDtabBuilder
     }
 
   /**
@@ -380,7 +380,7 @@ object Dtab {
 final class DtabBuilder extends Builder[Dentry, Dtab] {
   private[this] val builder = new VectorBuilder[Dentry]
 
-  def +=(d: Dentry): this.type = {
+  def addOne(d: Dentry): this.type = {
     builder += d
     this
   }

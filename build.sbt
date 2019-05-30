@@ -38,7 +38,7 @@ val jacksonVersion = "2.9.8"
 val jacksonLibs = Seq(
   "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
   "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion exclude("com.google.guava", "guava")
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.13.0-RC1" % jacksonVersion exclude("com.google.guava", "guava")
 )
 val thriftLibs = Seq(
   "org.apache.thrift" % "libthrift" % libthriftVersion intransitive()
@@ -55,10 +55,11 @@ def util(which: String) =
 val sharedSettings = Seq(
   version := releaseVersion,
   organization := "com.twitter",
-  scalaVersion := "2.12.8",
+  scalaVersion := "2.13.0-RC3",
+  crossScalaVersions := Seq("2.12.8", "2.13.0-RC3"),
   libraryDependencies ++= Seq(
     "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.8-RC2" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.8-RC5" % "test",
     // See https://www.scala-sbt.org/0.13/docs/Testing.html#JUnit
     "com.novocode" % "junit-interface" % "0.11" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test"
@@ -86,7 +87,7 @@ val sharedSettings = Seq(
   ),
   scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0",
   libraryDependencies +=  "org.scala-lang.modules" %% "scala-collection-compat" % "2.0.0",
-  addCompilerPlugin(scalafixSemanticdb),
+  addCompilerPlugin("org.scalameta" % "semanticdb-scalac_2.13.0-RC1" % "4.1.11"),
   scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"),
   javacOptions ++= Seq("-Xlint:unchecked", "-source", "1.8", "-target", "1.8"),
   javacOptions in doc := Seq("-source", "1.8"),
@@ -418,7 +419,7 @@ lazy val finagleServersets = Project(
   ScroogeSBT.autoImport.scroogeLanguages in Compile := Seq("java"),
   excludeFilter in unmanagedSources := "ZkTest.scala",
   scalacOptions in (Compile, doc) ++= {
-    if (scalaVersion.value.startsWith("2.12")) Seq("-no-java-comments")
+    if (scalaVersion.value.startsWith("2.13")) Seq("-no-java-comments")
     else Nil
   }
 ).dependsOn(finagleCore)

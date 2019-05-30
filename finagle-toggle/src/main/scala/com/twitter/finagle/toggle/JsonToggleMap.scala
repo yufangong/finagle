@@ -212,7 +212,7 @@ object JsonToggleMap {
           case captured: Toggle.Captured => captured.lastApply
           case _ => None
         }
-        LibraryToggle(Current(id, md.fraction, lastApply, md.description), details)
+        LibraryToggle(Current(id, md.fraction, lastApply, md.description), details.toSeq)
     }.toSeq
   }
 

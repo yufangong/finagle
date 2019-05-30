@@ -158,7 +158,7 @@ class WindowedPercentileHistogram(
               bucket.getCountAtValueIteratedTo.toInt)
         }
       }
-      bucketAndCounts
+      bucketAndCounts.toSeq
     }
 
     val iterator = synchronized {

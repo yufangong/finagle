@@ -226,7 +226,7 @@ class ServiceFactoryCache[Key, Req, Rep](
       lock.unlockWrite(writeStamp)
     }
     val closables = svcFacs :+ expiryTask
-    Closable.all(closables: _*).close(deadline)
+    Closable.all(closables.toSeq: _*).close(deadline)
   }
 
   private[finagle] def status(key: Key): Status = {
